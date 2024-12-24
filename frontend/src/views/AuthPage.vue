@@ -20,14 +20,33 @@ export default {
 <template>
   <div class="auth-page">
     <div v-if="showLogin">
-      <LoginForm @switchToRegister="showLogin=false" />
+      <LoginForm @switchToRegister="showLogin=false"/>
     </div>
     <div v-else>
-      <RegisterForm @switchToLogin="showLogin=true" />
+      <RegisterForm @switchToLogin="showLogin=true"/>
     </div>
   </div>
 </template>
 
 <style scoped>
+.auth-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.auth-page > div {
+  position: relative;
+  z-index: 2;
+  padding: 30px;
+  border-radius: 12px;
+  color: #fff;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
 
 </style>

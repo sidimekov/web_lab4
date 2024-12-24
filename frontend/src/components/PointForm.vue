@@ -16,11 +16,6 @@ export default {
       required: true
     }
   },
-  watch: {
-    selectedR() {
-
-    }
-  },
   methods: {
     avg(values) {
       if (values.length === 0) return null;
@@ -29,6 +24,9 @@ export default {
     },
     updateR() {
       this.$emit('updateR', this.avg(this.selectedR));
+    },
+    submitPoint() {
+      this.sendPoint({x: this.selectedX, y: this.yValue, r: this.selectedR});
     }
   }
 }
@@ -36,7 +34,7 @@ export default {
 
 <template>
   <div class="default-panel">
-    <form>
+    <form @submit.prevent="submitPoint">
 
       <div class="input-group">
         <div class="val-display">
@@ -55,7 +53,7 @@ export default {
         <div class="val-display">
           <label for="y-value">Y</label>
         </div>
-        <input id="y-value" type="text" v-model="yValue" placeholder="от -3 до 5"/>
+        <input id="y-value" type="text" maxlength="15" v-model="yValue" placeholder="от -3 до 5"/>
       </div>
 
       <div class="input-group">

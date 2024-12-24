@@ -5,7 +5,7 @@ export default {
   name: "Plot",
   props: {
     points: {
-      type: Object
+      type: Array
     },
     currentR: {
       type: Number
@@ -17,15 +17,12 @@ export default {
   },
   mounted() {
     this.drawPlot();
-    // this.addPoints();
+    this.drawPoints(this.points);
   },
   watch: {
     currentR() {
       d3.select("#plot svg").remove();
       this.drawPlot();
-      // this.addPoints();
-    },
-    points() {
       this.drawPoints(this.points);
     }
   },
@@ -37,8 +34,7 @@ export default {
     },
     drawPoint(x, y, r, isIn) {
       const currentR = parseFloat(this.currentR) || 4;
-      console.log(currentR, r);
-      if (r === currentR) {
+      if (Math.abs(r - currentR) < 1e-5) {
         const width = 400;
         const height = 400;
         const padding = 50;
@@ -56,12 +52,14 @@ export default {
             .attr("opacity", 0.8);
       }
     },
+    submitPoint(x, y, r) {
+      return this.sendPoint({x, y, r});
+    },
     drawPlot() {
       const width = 400;
       const height = 400;
-      const pad = 50;
+      const pad = 10;
       const r = parseFloat(this.currentR) || 4;
-      console.log(this.currentR)
       const svg = d3
           .select("#plot")
           .append("svg")
@@ -96,7 +94,7 @@ export default {
       // ось по X
       svg
           .append("g")
-          .attr("transform", `translate(0, ${height/2})`)
+          .attr("transform", `translate(0, ${height / 2})`)
           .call(d3.axisBottom(xScale).ticks(10).tickSizeOuter(0).tickFormat(d3.format(".1f")))
           .attr("color", axisColor);
 
@@ -146,8 +144,9 @@ export default {
             const coords = d3.pointer(e);
             const x = ((coords[0] - 200) / 37.5).toFixed(2);
             const y = -((coords[1] - 200) / 37.5).toFixed(2);
-            this.drawPoint(x,y,r,true);
-            console.log({x,y,r});
+            let resp = this.submitPoint(x, y, r);
+            this.drawPoint(resp.x, resp.y, resp.r, resp.isIn);
+            console.log({x, y, r});
           })
     }
   }
@@ -162,6 +161,10 @@ export default {
 </template>
 
 <style scoped>
+.default-panel {
+  margin: 40px auto;
+}
+
 #plot {
   display: flex;
   justify-content: center;

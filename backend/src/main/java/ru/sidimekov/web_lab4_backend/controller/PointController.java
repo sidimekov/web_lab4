@@ -2,6 +2,7 @@ package ru.sidimekov.web_lab4_backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.sidimekov.web_lab4_backend.dto.PointDTO;
 import ru.sidimekov.web_lab4_backend.model.Point;
 import ru.sidimekov.web_lab4_backend.service.PointService;
 
@@ -24,7 +25,7 @@ public class PointController {
     }
 
     @PostMapping("/sendPoint")
-    public void sendPoint(@RequestBody Point point, @RequestHeader("Authorization") String token) {
-        pointService.sendPoint(point, token);
+    public void sendPoint(@RequestBody PointDTO pointDTO, @RequestHeader("Authorization") String token) {
+        pointService.sendPoint(pointDTO, token);
     }
 }

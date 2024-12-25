@@ -32,7 +32,7 @@ public class Point {
     private double execTime;
 
     @ManyToOne
-    @JoinColumn(name="users_id", nullable = false)
-    private Users users;
+    @JoinColumn(name="user_id", nullable = false)
+    private User user;
 
 }

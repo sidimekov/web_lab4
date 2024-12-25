@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.sidimekov.web_lab4_backend.dto.PointDTO;
 import ru.sidimekov.web_lab4_backend.model.Point;
-import ru.sidimekov.web_lab4_backend.model.Users;
+import ru.sidimekov.web_lab4_backend.model.User;
 import ru.sidimekov.web_lab4_backend.repository.PointRepo;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
 import ru.sidimekov.web_lab4_backend.util.AreaChecker;
@@ -34,23 +34,23 @@ public class PointService {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtUtil.extractUsername(jwt);
-        Users users = userRepo.findByLogin(login);
+        User user = userRepo.findByLogin(login);
 
-        return pointRepo.findByUsers(users);
+        return pointRepo.findByUsers(user);
     }
 
     public void sendPoint(PointDTO reqPoint, String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtUtil.extractUsername(jwt);
-        Users users = userRepo.findByLogin(login);
+        User user = userRepo.findByLogin(login);
 
         Point point = new Point();
         point.setX(reqPoint.getX());
         point.setY(reqPoint.getY());
         point.setR(reqPoint.getR());
 
-        point.setUsers(users);
+        point.setUser(user);
 
         handlePoint(point);
 

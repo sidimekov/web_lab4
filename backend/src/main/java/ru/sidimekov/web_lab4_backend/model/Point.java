@@ -26,13 +26,13 @@ public class Point {
     private boolean isIn;
 
     @Column(nullable = false)
-    private String date;
+    private String point_date;
 
     @Column(nullable = false)
     private double execTime;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    private User user;
+    @JoinColumn(name="app_user_id", nullable = false)
+    private AppUser appUser;
 
 }

@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.sidimekov.web_lab4_backend.dto.UserDTO;
 import ru.sidimekov.web_lab4_backend.exception.AuthException;
-import ru.sidimekov.web_lab4_backend.model.User;
+import ru.sidimekov.web_lab4_backend.model.AppUser;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
 import ru.sidimekov.web_lab4_backend.util.JwtUtil;
 
@@ -27,9 +27,9 @@ public class AuthService {
     public String login(UserDTO userDTO) throws AuthenticationException {
         String login = userDTO.getLogin();
         String requestPassword = userDTO.getPassword();
-        User loginUser = userRepo.findByLogin(login);
-        if (loginUser != null && passwordEncoder.matches(requestPassword, loginUser.getPassword())) {
-            return jwtUtil.generateToken(loginUser.getLogin());
+        AppUser loginAppUser = userRepo.findByLogin(login);
+        if (loginAppUser != null && passwordEncoder.matches(requestPassword, loginAppUser.getPassword())) {
+            return jwtUtil.generateToken(loginAppUser.getLogin());
         }
         throw new AuthException("Invalid username or password");
     }
@@ -38,15 +38,15 @@ public class AuthService {
         String login = userDTO.getLogin();
         String password = userDTO.getPassword();
 
-        User loginUser = userRepo.findByLogin(login);
+        AppUser loginAppUser = userRepo.findByLogin(login);
 
-        if (loginUser == null) {
-            User user = new User();
-            user.setLogin(login);
-            user.setPassword(passwordEncoder.encode(password));
-            this.userRepo.save(user);
+        if (loginAppUser == null) {
+            AppUser appUser = new AppUser();
+            appUser.setLogin(login);
+            appUser.setPassword(passwordEncoder.encode(password));
+            this.userRepo.save(appUser);
 
-            return jwtUtil.generateToken(user.getLogin());
+            return jwtUtil.generateToken(appUser.getLogin());
         }
         throw new AuthException("This login already registered");
     }

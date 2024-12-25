@@ -3,8 +3,8 @@ package ru.sidimekov.web_lab4_backend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.sidimekov.web_lab4_backend.dto.PointDTO;
+import ru.sidimekov.web_lab4_backend.model.AppUser;
 import ru.sidimekov.web_lab4_backend.model.Point;
-import ru.sidimekov.web_lab4_backend.model.User;
 import ru.sidimekov.web_lab4_backend.repository.PointRepo;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
 import ru.sidimekov.web_lab4_backend.util.AreaChecker;
@@ -34,23 +34,23 @@ public class PointService {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtUtil.extractUsername(jwt);
-        User user = userRepo.findByLogin(login);
+        AppUser appUser = userRepo.findByLogin(login);
 
-        return pointRepo.findByUsers(user);
+        return pointRepo.findByAppUser(appUser);
     }
 
     public void sendPoint(PointDTO reqPoint, String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtUtil.extractUsername(jwt);
-        User user = userRepo.findByLogin(login);
+        AppUser appUser = userRepo.findByLogin(login);
 
         Point point = new Point();
         point.setX(reqPoint.getX());
         point.setY(reqPoint.getY());
         point.setR(reqPoint.getR());
 
-        point.setUser(user);
+        point.setAppUser(appUser);
 
         handlePoint(point);
 
@@ -66,7 +66,7 @@ public class PointService {
         String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         point.setIn(isInside);
-        point.setDate(currentTime);
+        point.setPoint_date(currentTime);
         point.setExecTime(execTime);
     }
 }

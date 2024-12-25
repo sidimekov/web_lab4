@@ -12,25 +12,28 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
-    environment:
-      - spring.datasource.url=jdbc:postgresql://db:5432/postgres
-      - spring.datasource.username=postgres
-      - spring.datasource.password=postgres
     depends_on:
       - db
     networks:
       - app-network
 
   db:
-    image: postgres:latest
+    image: container-registry.oracle.com/database/free:latest
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      ORACLE_PWD: oracle
+      ORACLE_SID: FREE
+      ORACLE_CHARACTERSET: AL32UTF8
     ports:
-      - "5432:5432"
+      - "1521:1521"
     networks:
       - app-network
+    volumes:
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'SELECT 1 FROM dual;' | sqlplus -s sys/oracle@FREE as sysdba" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
 
 networks:
   app-network:

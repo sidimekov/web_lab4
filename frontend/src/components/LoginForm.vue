@@ -14,11 +14,12 @@ export default {
 
   methods: {
     handleLogin() {
-      const resp = fetch("/api/users/login", {
+      const resp = fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         body: JSON.stringify({login: this.login, password: this.password}),
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       });
 
@@ -41,11 +42,11 @@ export default {
     <h2>ВОЙТИ</h2>
     <form @submit.prevent="handleLogin">
       <div class="form-group">
-        <input type="text" placeholder="Логин" id="login-input" required>
+        <input type="text" placeholder="Логин" id="login-input" v-model="login" required>
       </div>
 
       <div class="form-group">
-        <input type="password" placeholder="Пароль" id="password-input" required>
+        <input type="password" placeholder="Пароль" id="password-input" v-model="password" required>
       </div>
 
       <input type="submit" value="Войти" class="btn-primary">

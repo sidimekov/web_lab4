@@ -15,12 +15,13 @@ export default {
 
   methods: {
     handleRegister() {
-      if (this.password !== "" && this.password === this.password_confirm) {
-        const resp = fetch("/api/users/register", {
+      if (this.password === this.password_confirm) {
+        const resp = fetch("http://localhost:8080/api/users/register", {
           method: "POST",
           body: JSON.stringify({login: this.login, password: this.password}),
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
           }
         });
 
@@ -47,15 +48,15 @@ export default {
     <form @submit.prevent="handleRegister">
 
       <div class="form-group">
-        <input type="text" placeholder="Логин" id="login-input" required>
+        <input type="text" placeholder="Логин" id="login-input" v-model="login" required>
       </div>
 
       <div class="form-group">
-        <input type="password" placeholder="Пароль" id="password-input" required>
+        <input type="password" placeholder="Пароль" id="password-input" v-model="password" required>
       </div>
 
       <div class="form-group">
-        <input type="password" placeholder="Подтверждение пароля" id="password-confirm-input" required>
+        <input type="password" placeholder="Подтверждение пароля" id="password-confirm-input" v-model="password_confirm" required>
       </div>
 
       <div class="form-group">

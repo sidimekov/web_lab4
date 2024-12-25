@@ -18,7 +18,7 @@ export default {
   methods: {
     async fetchPoints() {
       try {
-        const response = await fetch("/api/points", {
+        const response = await fetch("http://localhost:8080/api/points", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -35,7 +35,7 @@ export default {
     },
     async sendPoint(point) {
       try {
-        const response = await fetch('/api/points/sendPoint', {
+        const response = await fetch('http://localhost:8080/api/points/sendPoint', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

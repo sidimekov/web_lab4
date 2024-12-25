@@ -8,12 +8,7 @@ export default {
   components: {PointTable, PointForm, Plot},
   data() {
     return {
-      points: [
-        { x: 1, y: 2, r: 3, isIn: true, date: '2024-12-24 12:34', execTime: 45 },
-        { x: -1, y: -2, r: 3, isIn: false, date: '2024-12-24 12:35', execTime: 50 },
-        { x: 0, y: 0, r: 4, isIn: true, date: '2024-12-24 12:36', execTime: 40 },
-        // другие точки...
-      ],
+      points: [],
       currentR: 4
     }
   },
@@ -23,7 +18,13 @@ export default {
   methods: {
     async fetchPoints() {
       try {
-        const response = await fetch("/api/points");
+        const response = await fetch("/api/points", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         this.points = await response.json();
       } catch (error) {
         console.error("Error fetching points: ", error);
@@ -34,10 +35,11 @@ export default {
     },
     async sendPoint(point) {
       try {
-        const response = await fetch('/api/sendPoint', {
+        const response = await fetch('/api/points/sendPoint', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
           body: JSON.stringify(point),
         });

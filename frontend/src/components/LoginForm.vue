@@ -1,6 +1,9 @@
 <script>
+import ErrorMessage from "@/components/ErrorMessage.vue";
+
 export default {
   name: "LoginForm",
+  components: {ErrorMessage},
 
   data() {
     return {
@@ -11,7 +14,23 @@ export default {
 
   methods: {
     handleLogin() {
-      // login
+      const resp = fetch("/api/users/login", {
+        method: "POST",
+        body: JSON.stringify({login: this.login, password: this.password}),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      resp.then(response => {
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        return true;
+      });
+      resp.catch(error => {
+        this.$refs.errorMessage.showMessage("эх ошибка на сервере");
+        console.log(error);
+      });
     }
   }
 }
@@ -33,6 +52,8 @@ export default {
     </form>
 
     <button @click="$emit('switchToRegister')" class="btn-secondary">или зарегистрироваться</button>
+
+    <ErrorMessage ref="errorMessage"/>
   </div>
 </template>
 

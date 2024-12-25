@@ -1,6 +1,9 @@
 <script>
+import ErrorMessage from "@/components/ErrorMessage.vue";
+
 export default {
   name: "RegisterForm",
+  components: {ErrorMessage},
 
   data() {
     return {
@@ -12,7 +15,27 @@ export default {
 
   methods: {
     handleRegister() {
-      // register
+      if (this.password !== "" && this.password === this.password_confirm) {
+        const resp = fetch("/api/users/register", {
+          method: "POST",
+          body: JSON.stringify({login: this.login, password: this.password}),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        resp.then(response => {
+          const token = response.data.token;
+          localStorage.setItem("token", token);
+          return true;
+        });
+        resp.catch(error => {
+          this.$refs.errorMessage.showMessage("эх ошибка на сервере");
+          console.log(error);
+        });
+      } else {
+        this.$refs.errorMessage.showMessage("Пароли не совпадают");
+      }
     }
   }
 }
@@ -41,6 +64,8 @@ export default {
     </form>
 
     <button @click="$emit('switchToLogin')" class="btn-secondary">или войти</button>
+
+    <ErrorMessage ref="errorMessage" />
   </div>
 </template>
 

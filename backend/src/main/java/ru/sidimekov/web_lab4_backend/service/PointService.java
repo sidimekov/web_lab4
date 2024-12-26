@@ -47,7 +47,10 @@ public class PointService {
         return handledPoints;
     }
 
-    public HandledPointDTO sendPoint(PointDTO reqPoint, String userToken) {
+    public HandledPointDTO sendPoint(PointDTO reqPoint, String userToken) throws IllegalArgumentException {
+
+        validatePoint(reqPoint);
+
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtService.extractLogin(jwt);
@@ -89,5 +92,19 @@ public class PointService {
         handledPoint.setPoint_date(point.getPoint_date());
         handledPoint.setExecTime(point.getExecTime());
         return handledPoint;
+    }
+
+    private void validatePoint(PointDTO point) throws IllegalArgumentException {
+
+        if (point.getX() < -4 || point.getX() > 4) {
+            throw new IllegalArgumentException("Значение X должно быть в диапазоне от -4 до 4");
+        }
+        if (point.getY() < -3 || point.getY() > 5) {
+            throw new IllegalArgumentException("Значение Y должно быть в диапазоне от -3 до 5");
+        }
+        if (point.getR() < -4 || point.getR() > 4) {
+            throw new IllegalArgumentException("Значение R должно быть в диапазоне от -4 до 4");
+        }
+
     }
 }

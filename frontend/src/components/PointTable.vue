@@ -28,7 +28,7 @@ export default {
         <td>{{ point.x }}</td>
         <td>{{ point.y }}</td>
         <td>{{ point.r }}</td>
-        <td>{{ point.isIn ? 'Да' : 'Нет' }}</td>
+        <td>{{ point.in ? 'Да' : 'Нет' }}</td>
         <td>{{ point.point_date }}</td>
         <td>{{ point.execTime }} ms</td>
       </tr>

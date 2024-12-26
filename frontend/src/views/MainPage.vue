@@ -2,10 +2,11 @@
 import Plot from "@/components/Plot.vue";
 import PointForm from "@/components/PointForm.vue";
 import PointTable from "@/components/PointTable.vue";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 export default {
   name: "MainPage",
-  components: {PointTable, PointForm, Plot},
+  components: {ErrorMessage, PointTable, PointForm, Plot},
   data() {
     return {
       points: [],
@@ -48,6 +49,20 @@ export default {
       this.currentR = parseFloat(newR);
     },
     async sendPoint(point) {
+
+      if (point.x < -4 || point.x > 4) {
+        this.$refs.errorMessage.showMessage("Значение X должно быть в диапазоне от -4 до 4");
+        return;
+      }
+      if (point.y < -3 || point.y > 5) {
+        this.$refs.errorMessage.showMessage("Значение Y должно быть в диапазоне от -3 до 5");
+        return;
+      }
+      if (point.r < -4 || point.r > 4) {
+        this.$refs.errorMessage.showMessage("Значение R должно быть в диапазоне от -4 до 4");
+        return;
+      }
+
       try {
         const response = await fetch('http://localhost:8080/api/points/sendPoint', {
           method: 'POST',
@@ -82,6 +97,8 @@ export default {
     </div>
     <PointTable :points="points" />
   </div>
+
+  <ErrorMessage ref="errorMessage"/>
 </template>
 
 <style scoped>

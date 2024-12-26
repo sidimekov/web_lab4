@@ -36,7 +36,11 @@ public class PointController {
             @RequestBody PointDTO pointDTO,
             @RequestHeader("Authorization") String token
     ) {
-        HandledPointDTO handledPoint = pointService.sendPoint(pointDTO, token);
-        return ResponseEntity.ok(handledPoint);
+        try {
+            HandledPointDTO handledPoint = pointService.sendPoint(pointDTO, token);
+            return ResponseEntity.ok(handledPoint);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

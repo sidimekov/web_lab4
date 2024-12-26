@@ -2,16 +2,19 @@ package ru.sidimekov.web_lab4_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.sidimekov.web_lab4_backend.dto.HandledPointDTO;
 import ru.sidimekov.web_lab4_backend.dto.PointDTO;
 import ru.sidimekov.web_lab4_backend.model.AppUser;
 import ru.sidimekov.web_lab4_backend.model.Point;
 import ru.sidimekov.web_lab4_backend.repository.PointRepo;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
 import ru.sidimekov.web_lab4_backend.util.AreaChecker;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,16 +31,23 @@ public class PointService {
         this.jwtService = jwtService;
     }
 
-    public List<Point> getAllPoints(String userToken) {
+    public List<HandledPointDTO> getAllPoints(String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtService.extractLogin(jwt);
         AppUser appUser = userRepo.findByLogin(login);
 
-        return pointRepo.findByAppUser(appUser);
+        List<Point> points = pointRepo.findByAppUser(appUser);
+        List<HandledPointDTO> handledPoints = new ArrayList<>();
+
+        points.forEach(point -> {
+            handledPoints.add(getHandledPointDTO(point));
+        });
+
+        return handledPoints;
     }
 
-    public void sendPoint(PointDTO reqPoint, String userToken) {
+    public HandledPointDTO sendPoint(PointDTO reqPoint, String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
         String login = jwtService.extractLogin(jwt);
@@ -53,6 +63,8 @@ public class PointService {
         handlePoint(point);
 
         pointRepo.save(point);
+
+        return getHandledPointDTO(point);
     }
 
     private void handlePoint(Point point) {
@@ -66,5 +78,16 @@ public class PointService {
         point.setIn(isInside);
         point.setPoint_date(currentTime);
         point.setExecTime(execTime);
+    }
+
+    private HandledPointDTO getHandledPointDTO(Point point) {
+        HandledPointDTO handledPoint = new HandledPointDTO();
+        handledPoint.setX(point.getX());
+        handledPoint.setY(point.getY());
+        handledPoint.setR(point.getR());
+        handledPoint.setIn(point.isIn());
+        handledPoint.setPoint_date(point.getPoint_date());
+        handledPoint.setExecTime(point.getExecTime());
+        return handledPoint;
     }
 }

@@ -8,10 +8,16 @@ export default {
     LoginForm,
     RegisterForm
   },
-
   data() {
     return {
       showLogin: true
+    }
+  },
+  mounted() {
+    const token = localStorage.getItem("token");
+
+    if (token && this.$route.path === "/") {
+      this.$router.push("/main");
     }
   }
 }

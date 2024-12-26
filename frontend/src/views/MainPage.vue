@@ -33,7 +33,10 @@ export default {
         });
 
         if (response.ok) {
-          this.points = await response.json();
+          const data = await response.json();
+          this.points = [...data];
+
+          await this.$refs.plot.drawPoints(this.points);
         } else {
           console.error("Error fetching points: ", response.error);
         }
@@ -55,7 +58,12 @@ export default {
           body: JSON.stringify(point),
         });
 
-        return await response.json();
+        const newPoint = await response.json();
+        await this.fetchPoints();
+
+        await this.$refs.plot.drawPoints(this.points);
+
+        return newPoint;
 
       } catch (error) {
         console.error('Error sending point:', error);
@@ -69,7 +77,7 @@ export default {
 <template>
   <div class="main-page">
     <div class="top-panel">
-      <Plot :points="points" :current-r="currentR" :send-point="sendPoint" />
+      <Plot ref="plot" :points="points" :current-r="currentR" :send-point="sendPoint" />
       <PointForm :send-point="sendPoint" @updateR="updateR"/>
     </div>
     <PointTable :points="points" />

@@ -1,6 +1,14 @@
 <script>
+import LogoutButton from "@/components/LogoutButton.vue";
+
 export default {
-  name: "Header"
+  name: "Header",
+  components: {LogoutButton},
+  methods: {
+    checkAuth() {
+      return localStorage.getItem("token") !== null;
+    }
+  }
 }
 </script>
 
@@ -8,17 +16,19 @@ export default {
   <header class="header">
     <div class="h-wrap">
       <h2>Сидимеков Дмитрий</h2>
+      <h3>P3222 Вар 950</h3>
     </div>
     <div class="h-wrap">
       <h1>WEB LAB 4</h1>
     </div>
     <div class="h-wrap">
-      <h3>P3222 Вар 950</h3>
+      <LogoutButton v-if="checkAuth"/>
     </div>
   </header>
 </template>
 
 <style scoped>
+
 
 .header {
   display: flex;
@@ -41,6 +51,10 @@ export default {
 .h-wrap {
   flex: 1;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 h1 {
@@ -49,6 +63,6 @@ h1 {
 }
 
 h1, h2, h3 {
-  margin: 15px;
+  margin: 3px 0;
 }
 </style>

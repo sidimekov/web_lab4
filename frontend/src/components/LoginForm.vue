@@ -25,7 +25,7 @@ export default {
 
         if (resp.ok) {
           const data = await resp.json();
-          const token = data.token
+          const token = data.token;
           localStorage.setItem("token", token);
           window.location.replace("/main");
           return true;

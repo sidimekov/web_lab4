@@ -32,8 +32,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(httpConfigurer -> {
                     httpConfigurer.requestMatchers("/api/users/login", "/api/users/register").anonymous();
-                    httpConfigurer.requestMatchers("/api/points", "/api/points/sendPoint").authenticated();
-                    httpConfigurer.anyRequest().denyAll();
+//                    httpConfigurer.requestMatchers("/api/points", "/api/points/sendPoint").authenticated();
+//                    httpConfigurer.anyRequest().denyAll();
+                    httpConfigurer.anyRequest().permitAll();
                 })
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(logoutConfigurer -> logoutConfigurer

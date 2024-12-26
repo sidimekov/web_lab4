@@ -1,12 +1,18 @@
 package ru.sidimekov.web_lab4_backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.sidimekov.web_lab4_backend.dto.HandledPointDTO;
 import ru.sidimekov.web_lab4_backend.dto.PointDTO;
 import ru.sidimekov.web_lab4_backend.model.Point;
 import ru.sidimekov.web_lab4_backend.service.PointService;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/points")
@@ -20,12 +26,17 @@ public class PointController {
     }
 
     @GetMapping
-    public List<Point> getAllPoints(@RequestHeader("Authorization") String token) {
-        return pointService.getAllPoints(token);
+    public ResponseEntity<?> getAllPoints(@RequestHeader("Authorization") String token) {
+        List<HandledPointDTO> handledPoints = pointService.getAllPoints(token);
+        return ResponseEntity.ok(handledPoints);
     }
 
     @PostMapping("/sendPoint")
-    public void sendPoint(@RequestBody PointDTO pointDTO, @RequestHeader("Authorization") String token) {
-        pointService.sendPoint(pointDTO, token);
+    public ResponseEntity<?> sendPoint(
+            @RequestBody PointDTO pointDTO,
+            @RequestHeader("Authorization") String token
+    ) {
+        HandledPointDTO handledPoint = pointService.sendPoint(pointDTO, token);
+        return ResponseEntity.ok(handledPoint);
     }
 }

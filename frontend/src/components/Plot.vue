@@ -29,7 +29,7 @@ export default {
   methods: {
     async drawPoints(points) {
       points.forEach((point) => {
-        this.drawPoint(point.x, point.y, point.r, point.isIn);
+        this.drawPoint(point.x, point.y, point.r, point.in);
       });
     },
     drawPoint(x, y, r, isIn) {
@@ -37,7 +37,7 @@ export default {
       if (Math.abs(r - currentR) < 1e-5) {
         const width = 400;
         const height = 400;
-        const padding = 50;
+        const padding = 30;
         const xScale = d3.scaleLinear().domain([-4, 4]).range([padding, width - padding]);
         const yScale = d3.scaleLinear().domain([-4, 4]).range([height - padding, padding]);
 
@@ -58,7 +58,7 @@ export default {
     drawPlot() {
       const width = 400;
       const height = 400;
-      const pad = 10;
+      const pad = 30;
       const r = parseFloat(this.currentR) || 4;
       const svg = d3
           .select("#plot")
@@ -142,8 +142,8 @@ export default {
       svg
           .on("click", (e) => {
             const coords = d3.pointer(e);
-            const x = ((coords[0] - 200) / 37.5).toFixed(2);
-            const y = -((coords[1] - 200) / 37.5).toFixed(2);
+            const x = ((coords[0] - 200) / 42.5).toFixed(2);
+            const y = -((coords[1] - 200) / 42.5).toFixed(2);
             let resp = this.submitPoint(x, y, r);
             this.drawPoint(resp.x, resp.y, resp.r, resp.isIn);
             console.log({x, y, r});

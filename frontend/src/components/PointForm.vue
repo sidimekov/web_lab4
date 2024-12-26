@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     avg(values) {
-      if (values.length === 0) return null;
+      if (values.length === 0) return 0.0;
       const sum = values.reduce((acc, a) => acc + parseFloat(a), 0);
       return (sum / values.length).toFixed(2);
     },
@@ -26,7 +26,7 @@ export default {
       this.$emit('updateR', this.avg(this.selectedR));
     },
     submitPoint() {
-      this.sendPoint({x: this.selectedX, y: this.yValue, r: this.selectedR});
+      this.sendPoint({x: this.avg(this.selectedX), y: this.yValue, r: this.avg(this.selectedR)});
     }
   }
 }

@@ -5,4 +5,5 @@ import ru.sidimekov.web_lab4_backend.model.AppUser;
 
 public interface UserRepo extends JpaRepository<AppUser, Long> {
     AppUser findByLogin(String login);
+    boolean existsByLogin(String login);
 }

@@ -8,20 +8,19 @@ import ru.sidimekov.web_lab4_backend.dto.UserDTO;
 import ru.sidimekov.web_lab4_backend.exception.AuthException;
 import ru.sidimekov.web_lab4_backend.model.AppUser;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
-import ru.sidimekov.web_lab4_backend.util.JwtUtil;
 
 @Service
 public class AuthService {
 
     private final UserRepo userRepo;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Autowired
-    public AuthService(UserRepo userRepo, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UserRepo userRepo, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
     }
 
     public String login(UserDTO userDTO) throws AuthenticationException {
@@ -29,7 +28,7 @@ public class AuthService {
         String requestPassword = userDTO.getPassword();
         AppUser loginAppUser = userRepo.findByLogin(login);
         if (loginAppUser != null && passwordEncoder.matches(requestPassword, loginAppUser.getPassword())) {
-            return jwtUtil.generateToken(loginAppUser.getLogin());
+            return jwtService.generateToken(loginAppUser.getLogin());
         }
         throw new AuthException("Invalid username or password");
     }
@@ -38,15 +37,13 @@ public class AuthService {
         String login = userDTO.getLogin();
         String password = userDTO.getPassword();
 
-        AppUser loginAppUser = userRepo.findByLogin(login);
-
-        if (loginAppUser == null) {
+        if (!userRepo.existsByLogin(login)) {
             AppUser appUser = new AppUser();
             appUser.setLogin(login);
             appUser.setPassword(passwordEncoder.encode(password));
             this.userRepo.save(appUser);
 
-            return jwtUtil.generateToken(appUser.getLogin());
+            return jwtService.generateToken(appUser.getLogin());
         }
         throw new AuthException("This login already registered");
     }

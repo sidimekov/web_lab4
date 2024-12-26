@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import ru.sidimekov.web_lab4_backend.dto.UserDTO;
+import ru.sidimekov.web_lab4_backend.exception.AuthException;
 import ru.sidimekov.web_lab4_backend.service.AuthService;
 
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class UserController {
             String token = authService.login(userDTO);
             response.put("token", token);
             return ResponseEntity.ok().body(response);
-        } catch (AuthenticationException e) {
+        } catch (AuthException e) {
             response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

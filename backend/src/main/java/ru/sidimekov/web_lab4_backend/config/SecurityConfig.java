@@ -2,14 +2,12 @@ package ru.sidimekov.web_lab4_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.sidimekov.web_lab4_backend.util.JwtAuthFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -23,13 +21,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/register").permitAll()  // Разрешаем доступ к логину и регистрации
-                        .anyRequest().authenticated())  // Для других запросов требуется аутентификация
-                .csrf(AbstractHttpConfigurer::disable)  // Отключение CSRF для API
-                .httpBasic(AbstractHttpConfigurer::disable)  // Отключение базовой аутентификации
-                .formLogin(AbstractHttpConfigurer::disable)  // Отключение формы логина
-                .addFilterBefore(new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.addAllowedOrigin("http://localhost");
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(httpConfigurer -> {
+                    httpConfigurer.requestMatchers("/api/users/login", "/api/users/register").anonymous();
+                    httpConfigurer.requestMatchers("/api/points", "/api/points/sendPoint").authenticated();
+                    httpConfigurer.anyRequest().denyAll();
+                })
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(logoutConfigurer -> logoutConfigurer
+                        .logoutUrl("/api/users/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
+                );
 
         return http.build();
     }

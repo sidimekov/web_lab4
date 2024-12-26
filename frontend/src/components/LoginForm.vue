@@ -13,25 +13,32 @@ export default {
   },
 
   methods: {
-    handleLogin() {
-      const resp = fetch("http://localhost:8080/api/users/login", {
-        method: "POST",
-        body: JSON.stringify({login: this.login, password: this.password}),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+    async handleLogin() {
+      try {
+        const resp = await fetch("http://localhost:8080/api/users/login", {
+          method: "POST",
+          body: JSON.stringify({login: this.login, password: this.password}),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
-      resp.then(response => {
-        const token = response.data.token;
-        localStorage.setItem("token", token);
-        return true;
-      });
-      resp.catch(error => {
-        this.$refs.errorMessage.showMessage("эх ошибка на сервере");
+        if (resp.ok) {
+          const data = await resp.json();
+          const token = data.token
+          localStorage.setItem("token", token);
+          window.location.replace("/main");
+          return true;
+        } else {
+          const errorData = await resp.json();
+          this.$refs.errorMessage.showMessage(errorData.message || "Ошибка на сервере");
+          return false;
+        }
+      } catch (error) {
+        this.$refs.errorMessage.showMessage("Ошибка на сервере");
         console.log(error);
-      });
+        return false;
+      }
     }
   }
 }
@@ -59,24 +66,24 @@ export default {
 </template>
 
 <style scoped>
-  h2 {
-    margin-bottom: 20px;
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #7f7fff;
-  }
+h2 {
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #7f7fff;
+}
 
-  .form-group {
-    margin-bottom: 20px;
-    text-align: left;
-  }
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
 
-  label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 1em;
-    color: #b0b0ff;
-  }
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1em;
+  color: #b0b0ff;
+}
 
 
 </style>

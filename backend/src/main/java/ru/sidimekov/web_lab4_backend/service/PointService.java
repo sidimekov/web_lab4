@@ -8,8 +8,6 @@ import ru.sidimekov.web_lab4_backend.model.Point;
 import ru.sidimekov.web_lab4_backend.repository.PointRepo;
 import ru.sidimekov.web_lab4_backend.repository.UserRepo;
 import ru.sidimekov.web_lab4_backend.util.AreaChecker;
-import ru.sidimekov.web_lab4_backend.util.JwtUtil;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,19 +19,19 @@ public class PointService {
 
     private final PointRepo pointRepo;
     private final UserRepo userRepo;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Autowired
-    public PointService(PointRepo pointRepo, UserRepo userRepo, JwtUtil jwtUtil) {
+    public PointService(PointRepo pointRepo, UserRepo userRepo, JwtService jwtService) {
         this.pointRepo = pointRepo;
         this.userRepo = userRepo;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
     }
 
     public List<Point> getAllPoints(String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
-        String login = jwtUtil.extractUsername(jwt);
+        String login = jwtService.extractLogin(jwt);
         AppUser appUser = userRepo.findByLogin(login);
 
         return pointRepo.findByAppUser(appUser);
@@ -42,7 +40,7 @@ public class PointService {
     public void sendPoint(PointDTO reqPoint, String userToken) {
         String jwt = userToken.replace("Bearer ", "");
 
-        String login = jwtUtil.extractUsername(jwt);
+        String login = jwtService.extractLogin(jwt);
         AppUser appUser = userRepo.findByLogin(login);
 
         Point point = new Point();

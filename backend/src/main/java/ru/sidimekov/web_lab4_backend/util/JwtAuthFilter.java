@@ -1,44 +1,72 @@
 package ru.sidimekov.web_lab4_backend.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.sidimekov.web_lab4_backend.service.JwtService;
+import ru.sidimekov.web_lab4_backend.service.UserService;
+
 import java.io.IOException;
-import java.util.Collections;
+
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private static final String SECRET_KEY = "your-secret-key";
+    private static final String AUTH_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+
+    private final JwtService jwtService;
+    private final UserService userService;
+
+    @Autowired
+    public JwtAuthFilter(JwtService jwtService, UserService userService) {
+        this.jwtService = jwtService;
+        this.userService = userService;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        String token = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AUTH_HEADER);
 
-        if (token != null && token.startsWith("Bearer ")) {
-            try {
-                String jwtToken = token.substring(7);
-                Claims claims = Jwts.parser()
-                        .setSigningKey(SECRET_KEY)
-                        .parseClaimsJws(jwtToken)
-                        .getBody();
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        claims.getSubject(), null, Collections.emptyList());
+        try {
+            String jwtToken = authHeader.substring(BEARER_PREFIX.length());
+            String login = jwtService.extractLogin(jwtToken);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDetails userDetails = userService.getByLogin(login);
 
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+            if (jwtService.validateToken(jwtToken, userDetails)) {
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+
             }
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         filterChain.doFilter(request, response);

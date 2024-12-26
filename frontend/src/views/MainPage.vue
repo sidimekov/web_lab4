@@ -13,6 +13,12 @@ export default {
     }
   },
   mounted() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      this.$router.push("/");
+    }
+
     this.fetchPoints();
   },
   methods: {
@@ -25,7 +31,12 @@ export default {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
           }
         });
-        this.points = await response.json();
+
+        if (response.ok) {
+          this.points = await response.json();
+        } else {
+          console.error("Error fetching points: ", response.error);
+        }
       } catch (error) {
         console.error("Error fetching points: ", error);
       }

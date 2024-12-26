@@ -14,26 +14,34 @@ export default {
   },
 
   methods: {
-    handleRegister() {
+    async handleRegister() {
       if (this.password === this.password_confirm) {
-        const resp = fetch("http://localhost:8080/api/users/register", {
-          method: "POST",
-          body: JSON.stringify({login: this.login, password: this.password}),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-          }
-        });
+        try {
+          const resp = await fetch("http://localhost:8080/api/users/register", {
+            method: "POST",
+            body: JSON.stringify({login: this.login, password: this.password}),
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
 
-        resp.then(response => {
-          const token = response.data.token;
-          localStorage.setItem("token", token);
-          return true;
-        });
-        resp.catch(error => {
-          this.$refs.errorMessage.showMessage("эх ошибка на сервере");
+          if (resp.ok) {
+            const data = await resp.json();
+            const token = data.token;
+            localStorage.setItem("token", token);
+            window.location.replace("/main");
+            return true;
+          } else {
+            const errorData = await resp.json();
+            this.$refs.errorMessage.showMessage(errorData.error || "Ошибка на сервере");
+            console.log(errorData);
+            return false;
+          }
+        } catch(error) {
+          this.$refs.errorMessage.showMessage("ошибка на сервере");
           console.log(error);
-        });
+          return false;
+        }
       } else {
         this.$refs.errorMessage.showMessage("Пароли не совпадают");
       }
